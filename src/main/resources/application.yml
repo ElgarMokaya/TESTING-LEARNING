@@ -1,0 +1,22 @@
+server:
+  port: 9021
+  servlet:
+    context-path: /api/demo
+
+spring:
+  application:
+    name: JUNIT-TESTING
+  datasource:
+    url: jdbc:postgresql://localhost:5432/demodb
+    username: postgres
+    password: admin
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 5
+      minimum-idle: 2
+  jpa:
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    open-in-view: false
