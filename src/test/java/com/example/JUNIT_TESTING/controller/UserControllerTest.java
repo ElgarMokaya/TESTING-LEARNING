@@ -2,6 +2,8 @@ package com.example.JUNIT_TESTING.controller;
 
 import com.example.JUNIT_TESTING.dto.UserCreationRequest;
 import com.example.JUNIT_TESTING.dto.UserCreationResponse;
+import com.example.JUNIT_TESTING.dto.UserResponse;
+import com.example.JUNIT_TESTING.dto.UserUpdateRequest;
 import com.example.JUNIT_TESTING.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -14,13 +16,13 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.List;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -65,9 +67,40 @@ public class UserControllerTest {
         var userId = UUID.randomUUID();
        doNothing(). when(userService).deleteUser(userId);
         //act
-        mockMvc.perform(delete("/v1/users/{userId}",userId))
+        mockMvc.perform(delete("/v1/{userId}",userId))
                 .andExpect(status().isNoContent());
         //assert
 
     }
+
+    @Test
+    void testGetUser() throws Exception {
+        //arrange
+        List<UserResponse> users =List.of(
+                UserResponse.builder()
+                        .id(UUID.randomUUID())
+                        .email("john@gmail.com")
+                        .firstName("John")
+                        .lastName("Doe")
+                        .gender("Male")
+                        .build(),
+                UserResponse.builder()
+                        .id(UUID.randomUUID())
+                        .email("elgar@gmail.com")
+                        .firstName("elgar")
+                        .lastName("Mokaya")
+                        .gender("Female")
+                        .build()
+        );
+        //act
+        when(userService.getAllUsers()).thenReturn(users);
+        //assert
+        mockMvc.perform(get("/v1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(2))
+                .andExpect(jsonPath("$[0].firstName").value("John"))
+                .andExpect(jsonPath("$[1].email").value("elgar@gmail.com"));
+
+    }
+
 }
