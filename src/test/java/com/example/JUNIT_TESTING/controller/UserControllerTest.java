@@ -4,6 +4,7 @@ import com.example.JUNIT_TESTING.dto.UserCreationRequest;
 import com.example.JUNIT_TESTING.dto.UserCreationResponse;
 import com.example.JUNIT_TESTING.dto.UserResponse;
 import com.example.JUNIT_TESTING.dto.UserUpdateRequest;
+import com.example.JUNIT_TESTING.model.User;
 import com.example.JUNIT_TESTING.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -71,6 +72,35 @@ public class UserControllerTest {
                 .andExpect(status().isNoContent());
         //assert
 
+    }
+    @Test
+    void testUpdateUser() throws Exception {
+        // Arrange
+        var userId = UUID.randomUUID();
+        UserUpdateRequest request = new UserUpdateRequest();
+        request.setFirstName("John");
+        request.setLastName("Doe");
+        request.setGender("Male");
+
+        UserResponse response = UserResponse.builder()
+                .id(userId)
+                .firstName("John")
+                .lastName("Doe")
+                .email("john.doe@example.com")
+                .gender("Male")
+                .build();
+
+        when(userService.updateUser(userId, request)).thenReturn(response);
+
+        mockMvc.perform(put("/v1/{id}", userId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(userId.toString()))
+                .andExpect(jsonPath("$.firstName").value("John"))
+                .andExpect(jsonPath("$.lastName").value("Doe"))
+                .andExpect(jsonPath("$.email").value("john.doe@example.com"))
+                .andExpect(jsonPath("$.gender").value("Male"));
     }
 
     @Test

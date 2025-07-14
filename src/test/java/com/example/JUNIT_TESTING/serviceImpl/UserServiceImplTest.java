@@ -91,6 +91,7 @@ public class UserServiceImplTest {
         var  id = UUID.randomUUID();
         when(userRepository.existsById(id)).thenReturn(false);
          RuntimeException exception=assertThrows(RuntimeException.class, () -> userService.deleteUser(id));
+
          assertEquals("User not found", exception.getMessage());
 
          verify(userRepository,times(1)).existsById(id);
